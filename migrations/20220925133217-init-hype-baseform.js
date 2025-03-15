@@ -5,7 +5,6 @@ module.exports = {
     await queryInterface.sequelize.query(`CREATE TABLE \`hype_base_form\` (
                                  \`id\` int(11) NOT NULL AUTO_INCREMENT,
                                  \`recordState\` enum('DRAFT','ACTIVE','ACTIVE_LOCK','CANCEL','ARCHIVED') DEFAULT NULL,
-                                 \`recordType\` enum('DEV', 'PROD') DEFAULT 'DEV',
                                  \`errors\` varchar(255) DEFAULT NULL,
                                  \`createdAt\` datetime NOT NULL,
                                  \`updatedAt\` datetime DEFAULT NULL,

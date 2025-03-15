@@ -39,10 +39,7 @@ import {
 import { HypeRequest } from '../../interfaces/request';
 import { HypeAuthGuard } from '../../auth/guard/hype-auth.guard';
 import { HypeAnonymousAuthGuard } from '../../auth/guard/hype-anonymous-auth.guard';
-import {
-  FormRecordEnvEnum,
-  FormRecordStateEnum,
-} from '../../entity/HypeBaseForm';
+import { FormRecordStateEnum } from '../../entity/HypeBaseForm';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { BlobStorageService } from '../../blob-storage/blob-storage.service';
 
@@ -372,7 +369,6 @@ export class FormRecordController {
       form.id,
       body.data,
       body.recordState,
-      body.recordType,
     );
   }
 
