@@ -78,12 +78,8 @@ export class FormRecordController {
       throw new Error('Form not found.');
     }
 
-    if (query.recordType == null) {
-      query.recordType = 'PROD';
-    }
     const where = {};
     where[`${form.slug}.deletedAt`] = null;
-    where[`${form.slug}.recordType`] = query.recordType;
     if (query.selects != null) {
     }
     const [data, total] = await Promise.all([

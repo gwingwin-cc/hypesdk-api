@@ -10,6 +10,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { AuthController } from './auth.controller';
 import { HypeAuthGuard } from './guard/hype-auth.guard';
 import { HypeAnonymousAuthGuard } from './guard/hype-anonymous-auth.guard';
+import { HypeAuthStrategy } from './strategies/hype-auth.strategy';
+import { HypeAnonymousStrategy } from './strategies/hype-anonymous-auth.strategy';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { HypeAnonymousAuthGuard } from './guard/hype-anonymous-auth.guard';
   ],
   controllers: [AuthController],
   providers: [
+    HypeAuthStrategy,
+    HypeAnonymousStrategy,
     AuthService,
     JwtStrategy,
     LocalStrategy,
