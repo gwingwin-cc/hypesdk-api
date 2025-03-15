@@ -1,16 +1,11 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import {
-  FormRecordEnvType,
-  FormRecordStateType,
-} from '../../entity/HypeBaseForm';
+import { FormRecordStateType } from '../../entity/HypeBaseForm';
 
 export class CreateFormRecordDto {
   data: any;
   @IsOptional()
   recordState?: FormRecordStateType;
-  @IsOptional()
-  recordType?: FormRecordEnvType;
 }
 export class UpdateFormRecordRequest {
   data: any;
@@ -33,11 +28,11 @@ export class FormRecordListQuery {
 
   @IsString()
   @IsOptional()
-  recordType?: FormRecordEnvType;
-
-  @IsString()
-  @IsOptional()
   format?: string;
+
+  @IsArray()
+  @IsOptional()
+  selects?: string[];
 
   [key: string]: any;
 }

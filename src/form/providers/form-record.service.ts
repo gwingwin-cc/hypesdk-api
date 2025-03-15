@@ -28,8 +28,6 @@ import { FormService } from './form.service';
 import { BlobStorageService } from '../../blob-storage/blob-storage.service';
 import { InjectConnection } from 'nestjs-knex';
 import {
-  FormRecordEnvEnum,
-  FormRecordEnvType,
   FormRecordStateEnum,
   FormRecordStateType,
   HypeBaseForm,
@@ -106,13 +104,7 @@ export class FormRecordService {
       if (form == null) {
         throw new Error('form not found:' + formSlug);
       }
-      return this.saveRecord(
-        user,
-        form.id,
-        data,
-        FormRecordStateEnum.DRAFT,
-        FormRecordEnvEnum.DEV,
-      );
+      return this.saveRecord(user, form.id, data, FormRecordStateEnum.DRAFT);
     },
     getDataList: async ({ formSlug, options }) => {
       return this.find(formSlug, options);
@@ -177,7 +169,6 @@ export class FormRecordService {
     formId: number,
     data: any,
     recordState: FormRecordStateType = FormRecordStateEnum.ACTIVE,
-    recordType: FormRecordEnvType = FormRecordEnvEnum.PROD,
   ) {
     const granted = await this.validatePermissionGranted(
       formId,
@@ -191,13 +182,7 @@ export class FormRecordService {
       );
     }
     return {
-      id: await this.saveRecord(
-        createdBy,
-        formId,
-        data,
-        recordState,
-        recordType,
-      ),
+      id: await this.saveRecord(createdBy, formId, data, recordState),
     };
   }
   async saveRecord(
@@ -205,7 +190,6 @@ export class FormRecordService {
     formId: number,
     data: any,
     recordState: FormRecordStateType,
-    recordType: FormRecordEnvType,
   ) {
     const form = await this.formModel.findByPk(formId, {
       include: [HypeFormField],
@@ -260,7 +244,6 @@ export class FormRecordService {
     const sql = knexBuilder(tableSlug)
       .insert({
         recordState: recordState ?? 'DRAFT',
-        recordType: recordType,
         createdAt: knexBuilder.fn.now(),
         updatedAt: knexBuilder.fn.now(),
         createdBy: byUser?.id ?? null,
@@ -443,15 +426,21 @@ export class FormRecordService {
       where?: any;
       orWhere?: any;
       sort?: any;
+      selects?: Array<string>;
       columnList?: Array<string>;
     },
   ) {
     const tableSlug = 'zz_' + slug;
     // const knexBuilder = knex({ client: 'mysql' });
-    let sqlBuild = this.knex
-      .table(tableSlug + ` as ${slug}`)
-      .select(`${slug}.* `, 'users.username as createdByUser');
+    let sqlBuild = knex({ client: 'mysql' }).table(tableSlug + ` as ${slug}`);
 
+    if (options.selects != null) {
+      const selectList = options.selects.map((s) => `${slug}.${s}`);
+      selectList.push(`${slug}.id`);
+      sqlBuild.select(selectList);
+    } else {
+      sqlBuild.select(`${slug}.* `, 'users.username as createdByUser');
+    }
     if (options.where != null) {
       sqlBuild.andWhere(options.where);
     }

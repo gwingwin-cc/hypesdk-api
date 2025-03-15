@@ -3,15 +3,17 @@ import { PassportStrategy } from '@nestjs/passport';
 import { UserService } from '../../user/user.service';
 import { AuthService } from '../auth.service';
 import { Strategy } from 'passport-custom';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
-export class HypeAnonymousAuthStrategy extends PassportStrategy(
+export class HypeAnonymousStrategy extends PassportStrategy(
   Strategy,
   'hype-anonymous',
 ) {
   constructor(
     private userService: UserService,
     private authService: AuthService,
+    private jwtService: JwtService,
   ) {
     super();
   }
@@ -22,28 +24,26 @@ export class HypeAnonymousAuthStrategy extends PassportStrategy(
     const authorization = headers['authorization'];
 
     if (apiKey != null) {
-      const allow = await this.authService.validateApiKey(headers);
-      if (!allow) {
-        throw new UnauthorizedException('API Key is invalid');
-      }
-      const user = await this.userService.getUserByApiKey(apiKey);
-      return user;
+      await this.authService.validateApiKey(headers);
+      return true;
     }
     if (authorization != null) {
-      const result = this.authService.validateJwt(
-        authorization.split('Bearer ')[1],
-      );
-      if (result == false) {
+      const token = req.headers['authorization'].split(' ')[1];
+
+      let user = null;
+      try {
+        const result = await this.jwtService.verify(token);
+        user = await this.userService.findOne({
+          id: result.sub,
+        });
+      } catch (e) {}
+
+      if (user == null) {
         throw new UnauthorizedException();
       }
-      const user = await this.userService.findOne({
-        id: result['sub'],
-      });
-      if (user == null) {
-        throw new UnauthorizedException('token valid but user not exist');
-      }
       return user;
+    } else {
+      return null;
     }
-    return null;
   }
 }

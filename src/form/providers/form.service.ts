@@ -274,10 +274,12 @@ export class FormService {
 
     const tableSlug = 'zz_' + form.slug;
     // // TODO add unit test and check exist column
+    const afterField = 'recordState';
     await this.sequelize.query(
       `
                 ALTER TABLE ${tableSlug}
-                    ADD COLUMN ${slug} ${allowFieldType.columnType} NULL;
+                    ADD COLUMN ${slug} ${allowFieldType.columnType} NULL
+                        AFTER ${afterField};
             `,
     );
     Logger.log(`to table slug ${tableSlug}`, 'addField');

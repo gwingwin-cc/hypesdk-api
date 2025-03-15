@@ -18,17 +18,8 @@ export class HypeBaseForm extends BaseEntity {
   @Column(DataType.ENUM('DRAFT', 'ACTIVE', 'ACTIVE_LOCK', 'CANCEL', 'ARCHIVED'))
   recordState: FormRecordStateType;
 
-  @Column(DataType.ENUM('DEV', 'PROD'))
-  recordType: FormRecordEnvType;
-
   @Column(DataType.STRING)
   errors: string;
 
   [key: string]: any;
-}
-
-export type FormRecordEnvType = keyof typeof FormRecordEnvEnum;
-export enum FormRecordEnvEnum {
-  DEV = 'DEV',
-  PROD = 'PROD',
 }

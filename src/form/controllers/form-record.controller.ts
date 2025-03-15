@@ -87,8 +87,15 @@ export class FormRecordController {
     const where = {};
     where[`${form.slug}.deletedAt`] = null;
     where[`${form.slug}.recordType`] = query.recordType;
+    if (query.selects != null) {
+    }
     const [data, total] = await Promise.all([
-      this.formRecordService.find(form.slug, { where }),
+      this.formRecordService.find(form.slug, {
+        search: query.search,
+        where,
+        selects: query.selects,
+        columnList: query.selects,
+      }),
       this.formRecordService.count(form.slug, where),
     ]);
     return {
@@ -410,7 +417,6 @@ export class FormRecordController {
         form.id,
         d,
         FormRecordStateEnum.ACTIVE,
-        FormRecordEnvEnum.PROD,
       );
       savedData.push(created);
     }
